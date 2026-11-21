@@ -1,0 +1,6 @@
+header { display: flex; align-items: center; gap: 24px; background: #1f3a68; color: #fff; padding: 12px 24px; }
+header h1 { margin: 0; font-size: 1.4rem; }
+nav a { color: #dfe7f5; margin-right: 16px; text-decoration: none; padding: 4px 0; }
+nav a.active { color: #fff; border-bottom: 2px solid #fff; }
+.banner { background: #fff4d6; border-bottom: 1px solid #e5cf8a; margin: 0; padding: 8px 24px; }
+main { padding: 16px 24px; max-width: 1000px; }
