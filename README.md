@@ -2,6 +2,7 @@
 
 A full-stack app for managing employees, recording timesheets, and calculating pay with weekly overtime and tax deductions. The back end is a REST API built with C#, ASP.NET Core, Entity Framework Core and SQLite, tested with xUnit and containerized with Docker. The front end is an Angular app (TypeScript, standalone components, signals, reactive forms) tested with Vitest. CI runs on GitHub Actions.
 
+**Live API on Microsoft Azure App Service:** https://payroll-sneha-api.azurewebsites.net/swagger
 **Live demo (Angular front end):** https://snehachowdary56.github.io/PayrollApi/
 
 > The live demo runs in demo mode: there is no server on GitHub Pages, so made-up data is kept in your browser and pay is calculated with a TypeScript copy of the same rules as the C# API (tested against the same cases). Run the API locally to use the real back end.
@@ -97,6 +98,27 @@ docker run -p 8080:8080 payroll-api
 
 Open `http://localhost:8080/swagger`.
 
+## Deploy to Azure App Service
+
+The API runs on Azure App Service (Linux, free F1 plan, .NET 10). It was deployed with the Azure CLI:
+
+```bash
+az group create --name payroll-rg --location canadacentral
+az appservice plan create --name payroll-plan --resource-group payroll-rg --sku F1 --is-linux --location belgiumcentral
+az webapp create --name payroll-sneha-api --resource-group payroll-rg --plan payroll-plan --runtime "DOTNETCORE:10.0"
+# SQLite file in /home, the writable, persistent folder on App Service
+az webapp config appsettings set --name payroll-sneha-api --resource-group payroll-rg \
+  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false "ConnectionStrings__Payroll=Data Source=/home/payroll.db"
+az webapp config set --name payroll-sneha-api --resource-group payroll-rg --startup-file "dotnet PayrollApi.dll"
+
+# Build locally, zip the published output and deploy it
+dotnet publish src/PayrollApi -c Release -o publish
+cd publish && zip -r ../payroll.zip . && cd ..
+az webapp deploy --name payroll-sneha-api --resource-group payroll-rg --src-path payroll.zip --type zip
+```
+
+Lessons from the first deployment: `az webapp up` is retired, so the app is created step by step; the student subscription only allows certain regions (the plan is in Belgium Central); a zip made with Windows PowerShell's `Compress-Archive` was rejected, so the app is published locally and zipped with `tar`; and the app needed an explicit startup command before it would start.
+
 ## Endpoints
 
 | Method | Route | Description |
@@ -136,5 +158,5 @@ curl "http://localhost:5000/api/employees/1/payroll?from=2026-11-02&to=2026-11-0
 
 - Switch from `EnsureCreated` to EF Core migrations
 - Add authentication (e.g. JWT) with employee vs. manager roles
-- Deploy to Azure App Service with Azure SQL
+- Move the database from SQLite to Azure SQL
 - Add province-specific overtime rules (e.g. Ontario's 44-hour threshold)
