@@ -22,7 +22,7 @@ then with a policy error in other regions.
 **Cause.** Linux App Service names .NET runtimes as `DOTNETCORE:<version>`; `dotnet:10` is not a valid value
 (and `az webapp up`, which picks it for you, is retired).
 
-**Fix.** `az webapp list-runtimes --os linux` showed the exact name; used `--runtime "DOTNETCORE:10.0"`.
+**Fix.** Used the Linux runtime name `--runtime "DOTNETCORE:10.0"` and created the app step by step instead of with `az webapp up`.
 
 **Prevention.** The README uses the explicit step-by-step commands with the correct runtime name.
 
@@ -40,7 +40,7 @@ and App Service was also trying to build the uploaded source on the server.
 
 ## 4. Site deployed but would not start
 
-**Symptom.** The deploy succeeded, but the site returned an error page and the log stream showed the container exiting.
+**Symptom.** The deploy succeeded, but the site did not start and returned an error page.
 
 **Cause.** App Service did not know which assembly to run for this layout.
 
@@ -51,11 +51,10 @@ and App Service was also trying to build the uploaded source on the server.
 
 ## 5. Angular timesheet test failed: wrong first employee
 
-**Symptom.** A Vitest test for the timesheet page failed: it expected an employee who was not the first in the list.
+**Symptom.** A Vitest test for the timesheet page failed: it expected 10 days and 90 hours but got a different employee's hours.
 
-**Cause.** The test assumed the order of the demo data instead of reading it; the page lists employees in the order
-the API returns them.
+**Cause.** The test assumed which employee the page selects by default; that employee was not the one with the 10 seeded days.
 
-**Fix.** The test now selects the employee it needs from the demo data instead of assuming the first one.
+**Fix.** The test now selects employee 1 (Asha, 10 seeded days of 9 hours) explicitly before checking the total.
 
-**Prevention.** Tests look up the record they depend on, so changing the sample data does not break them.
+**Prevention.** Tests choose the record they depend on instead of relying on a default, so changing the default does not break them.
