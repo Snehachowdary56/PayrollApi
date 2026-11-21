@@ -117,7 +117,7 @@ cd publish && zip -r ../payroll.zip . && cd ..
 az webapp deploy --name payroll-sneha-api --resource-group payroll-rg --src-path payroll.zip --type zip
 ```
 
-Lessons from the first deployment: `az webapp up` is retired, so the app is created step by step; the student subscription only allows certain regions (the plan is in Belgium Central); a zip made with Windows PowerShell's `Compress-Archive` was rejected, so the app is published locally and zipped with `tar`; and the app needed an explicit startup command before it would start.
+Lessons from the first deployment (full write-ups in [BUGS.md](BUGS.md)): `az webapp up` is retired, so the app is created step by step; the student subscription only allows certain regions (the plan is in Belgium Central); a zip made with Windows PowerShell's `Compress-Archive` was rejected, so the app is published locally and zipped with `tar`; and the app needed an explicit startup command before it would start.
 
 ## Endpoints
 
